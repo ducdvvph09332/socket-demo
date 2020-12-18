@@ -7,6 +7,9 @@ var port = process.env.PORT || 3000;
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
+app.get('/sound', (req, res) => {
+    res.sendFile(__dirname + '/audio/notify.mp3');
+});
 // const users = {}
 
 io.on('connection', (socket) => {
@@ -15,14 +18,10 @@ io.on('connection', (socket) => {
     //     socket.broadcast.emit('user-connected', name);
     // })
 
-    socket.on('msg', (msg) => {
+    socket.on('msg', (data) => {
         socket.broadcast.emit('msg', {
-            username: "anonymous",
-            message: msg
-        });
-        socket.emit('msg', {
-            username: "You",
-            message: msg
+            light: data.light,
+            temp: data.temp
         });
         // io.emit('msg', msg);
     });

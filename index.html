@@ -1,53 +1,51 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Socket.IO chat</title>
+    <title>Socket.IO Duc Dinh</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
     <style>
-      * {
+      /* Chrome, Safari, Edge, Opera */
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
         margin: 0;
-        padding: 0;
-        box-sizing: border-box;
       }
-      body {
-        font: 13px Helvetica, Arial;
-      }
-      form {
-        background: #000;
-        padding: 3px;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-      }
-      form input {
-        border: 0;
-        padding: 10px;
-        width: 90%;
-        margin-right: 0.5%;
-      }
-      form button {
-        width: 9%;
-        background: rgb(130, 224, 255);
-        border: none;
-        padding: 10px;
-      }
-      #messages {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-      }
-      #messages li {
-        padding: 5px 10px;
-      }
-      #messages li:nth-child(odd) {
-        background: #eee;
+
+      /* Firefox */
+      input[type="number"] {
+        -moz-appearance: textfield;
       }
     </style>
   </head>
   <body>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
+    <div class="container">
+      <ul id="messages"></ul>
+      <audio id="audio" autoplay></audio>
+      <form action="">
+        <label for="">Light</label>
+        <select id="light" class="custom-select sections" readonly>
+          <option value="1">Dark</option>
+          <option value="2">Sunlight</option>
+          <option value="3">Moonlight</option>
+          <option value="3">Light</option>
+        </select>
+        <div class="form-group mt-3">
+          <label for="">Temperature</label><br />
+          <input
+            type="number"
+            id="temp"
+            autocomplete="off"
+            class="form-control sections"
+          /><br />
+        </div>
+        <button class="btn btn-primary">Submit</button>
+      </form>
+    </div>
   </body>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -56,16 +54,24 @@
       var socket = io();
       $("form").submit((e) => {
         e.preventDefault(); // prevents page reloading
-        socket.emit("msg", $("#m").val());
-        $("#m").val("");
+        let data = {
+          light: $("#light").val(),
+          temp: $("#temp").val(),
+        };
+        socket.emit("msg", data);
         return false;
       });
       socket.on("msg", (data) => {
-        $("#messages").append(
-          $("<li>").text(`${data.username}: ${data.message}`)
-        );
+        if (data !== "") {
+          $("#audio").append($("<source>").attr("src", "/sound"));
+          $("#messages").html($("<li>").text("New change"));
+          $("#light").val(`${data.light}`);
+          $("#temp").val(`${data.temp}`);
+          $(".btn").hide();
+          $(".sections").prop("readonly", true);
+          $(".sections").prop("disabled", true);
+        }
       });
     });
   </script>
-
 </html>
