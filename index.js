@@ -10,32 +10,43 @@ app.get('/', (req, res) => {
 app.get('/sound', (req, res) => {
     res.sendFile(__dirname + '/audio/notify.mp3');
 });
-// const users = {}
 
 io.on('connection', (socket) => {
-    // socket.on('new-user', name => {
-    //     users[socket.id] = name;
-    //     socket.broadcast.emit('user-connected', name);
-    // })
+    let countUser = io.engine.clientsCount;
+    socket.emit('user-connected', countUser);
+    // join room
+    socket.join(`${socket.id}`)
+        // console.log(socket.rooms);
+    // get data
+    socket.on('msg-sent', (data) => {
+        // post data for all
+        if (data.notify_for === "all") {
+            socket.broadcast.emit('msg', {
+                light: data.light,
+                temp: data.temp
+            }); 
+        } else {
+            // post data
+            socket.to(`${data.notify_for}`).emit('msg', {
+                light: data.light,
+                temp: data.temp
+            });
+            //post text
+            socket.emit("save", "Saved changes")
+        }
 
-    socket.on('msg', (data) => {
-        socket.broadcast.emit('msg', {
-            light: data.light,
-            temp: data.temp
-        });
-        // io.emit('msg', msg);
     });
+    // get user option
+    socket.on('user-info', (user_info) => {
+        socket.broadcast.emit('notify-for', {
+            user_id: socket.id,
+            user_name: user_info
+        })
+        socket.emit('user-name', (user_info))
+    })
 
 });
 
 http.listen(port, () => {
     console.log('Server listening at port:' + port);
 });
-
-// Broadcast a message to connected users when someone connects or disconnects.
-// Add support for nicknames.
-// Don’t send the same message to the user that sent it.Instead, append the message directly as soon as he / she presses enter.
-// Add “{ user } is typing” functionality.
-// Show who’s online.
-// Add private messaging.
-// Share your improvements!

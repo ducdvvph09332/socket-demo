@@ -24,16 +24,25 @@
   </head>
   <body>
     <div class="container">
+      <div class="" id="user_name"></div>
       <ul id="messages"></ul>
-      <audio id="audio" autoplay></audio>
+      <audio id="audio"></audio>
       <form action="">
-        <label for="">Light</label>
-        <select id="light" class="custom-select sections" readonly>
-          <option value="1">Dark</option>
-          <option value="2">Sunlight</option>
-          <option value="3">Moonlight</option>
-          <option value="3">Light</option>
-        </select>
+        <div id="" class="notify_for">
+          <label for="">Notify for</label>
+          <select id="notify_for" class="custom-select sections" readonly>
+            <option value="all" selected>All</option>
+          </select>
+        </div>
+        <div class="mt-3">
+          <label for="">Light</label>
+          <select id="light" class="custom-select sections" readonly>
+            <option value="1">Dark</option>
+            <option value="2">Moonlight</option>
+            <option value="3">Light</option>
+            <option value="4">Sunlight</option>
+          </select>
+        </div>
         <div class="form-group mt-3">
           <label for="">Temperature</label><br />
           <input
@@ -52,25 +61,60 @@
   <script>
     $(() => {
       var socket = io();
+      //count user
+      socket.on("user-connected", (data) => {
+        if (data > 1) {
+          $(".btn").hide();
+          $(".sections").prop("readonly", true);
+          $(".sections").prop("disabled", true);
+          $(".notify_for").hide();
+          //get user information
+          var user_info = prompt("What your name?");
+          socket.emit("user-info", user_info);
+        }
+      });
+      //
+      //submit server
       $("form").submit((e) => {
         e.preventDefault(); // prevents page reloading
         let data = {
           light: $("#light").val(),
           temp: $("#temp").val(),
+          notify_for: $("#notify_for").val(),
         };
-        socket.emit("msg", data);
+        socket.emit("msg-sent", data);
         return false;
       });
+      // save change text
+      socket.on("save", (data) => {
+        $("#messages").html($("<li>").text(`${data}`));
+        $("#messages li").click(() => {
+          $("#messages li").remove();
+        });
+      });
+      // new changes client
       socket.on("msg", (data) => {
-        if (data !== "") {
-          $("#audio").append($("<source>").attr("src", "/sound"));
-          $("#messages").html($("<li>").text("New change"));
-          $("#light").val(`${data.light}`);
-          $("#temp").val(`${data.temp}`);
-          $(".btn").hide();
-          $(".sections").prop("readonly", true);
-          $(".sections").prop("disabled", true);
-        }
+        $("#audio").attr("autoplay", true);
+        $("#audio").append($("<source>").attr("src", "/sound"));
+        $("#messages").html($("<li>").text("New changes"));
+        $("#light").val(`${data.light}`);
+        $("#temp").val(`${data.temp}`);
+        $("#messages li").click(() => {
+          $("#messages li").remove();
+          $("#audio source").remove();
+          $("#audio").removeAttr("autoplay");
+        });
+      });
+      //render user name
+      socket.on("user-name", (data) => {
+        $("#user_name").text(`Hello, ${data}`);
+        $("title").text(`Socket.IO | ${data}`)
+      });
+      //render notify for
+      socket.on("notify-for", (data) => {
+        $("#notify_for").append(
+          `<option value="${data.user_id}">${data.user_name}</option>`
+        );
       });
     });
   </script>
