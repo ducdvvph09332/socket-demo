@@ -107,8 +107,8 @@
       });
       //render user name
       socket.on("user-name", (data) => {
+        $("title").text(`Socket.IO | ${data}`);
         $("#user_name").text(`Hello, ${data}`);
-        $("title").text(`Socket.IO | ${data}`)
       });
       //render notify for
       socket.on("notify-for", (data) => {
