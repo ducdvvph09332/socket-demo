@@ -6,7 +6,9 @@
     "develop": "nodemon serve.js"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "express": "^4.15.2",
+    "laravel-echo-server": "^1.6.2",
     "socket.io": "^3.0.4"
   },
   "devDependencies": {

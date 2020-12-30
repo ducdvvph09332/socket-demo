@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <form action="">
+      <label for="">Email</label>
+      <input type="text" name="email" id="" />
+      <label for="">Password</label>
+      <input type="password" name="password" id="" />
+      <button>Submit</button>
+    </form>
+  </body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script>
+    $(() => {
+      var socket = io();
+      socket.on('check_logged', data=> {
+        if(data!==null){
+          window.location.href = '/';
+        }
+      })
+       $("form").submit((e) => {
+        e.preventDefault(); // prevents page reloading
+        let data = {
+          email: $("input[name=email]").val(),
+          password: $("input[name=password]").val(),
+        };
+        socket.emit("check_login", data);
+        console.log
+      });
+    });
+  </script>
+</html>

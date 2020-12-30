@@ -55,25 +55,21 @@
         <button class="btn btn-primary">Submit</button>
       </form>
     </div>
+
   </body>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <script>
     $(() => {
       var socket = io();
-      //count user
-      socket.on("user-connected", (data) => {
-        if (data > 1) {
-          $(".btn").hide();
-          $(".sections").prop("readonly", true);
-          $(".sections").prop("disabled", true);
-          $(".notify_for").hide();
-          //get user information
-          var user_info = prompt("What your name?");
-          socket.emit("user-info", user_info);
+      socket.on('check_logged', user => {
+        if(user===null){
+          window.location.href = '/login';
+        }else{
+          window.location.href = '/';
+          console.log(user);
         }
-      });
-      //
+      })
       //submit server
       $("form").submit((e) => {
         e.preventDefault(); // prevents page reloading
